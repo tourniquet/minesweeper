@@ -23,6 +23,8 @@ let playState = {
 
     this.cells = game.add.group()
 
+    // where i if for column
+    // and j is for row
     for (let i = 0; i < this.template.length; i++) {
       for (let j = 0; j < this.template.length; j++) {
         let cell = this.cells.create(i * this.cellWidth, j * this.cellHeight, 'cell')
@@ -31,18 +33,21 @@ let playState = {
       }
     }
 
+    // call setMines function 10 times, to set all 10 mines
     for (let i = 0; i < 10; i++) {
       this.setMines()
     }
 
     this.showMines()
+
+    this.drawNumbers()
   },
   setMines () {
     // I will use 'board' instead of 'this.template' because is shorter
     let board = this.template
 
-    var column
-    var row
+    let column
+    let row
 
     function randNum () {
       column = Math.floor(Math.random() * 9)
@@ -51,58 +56,81 @@ let playState = {
 
     randNum()
 
-    while (board[row][column]) {
+    while (board[column][row]) {
       randNum()
     }
 
-    board[row][column] = 'x'
+    board[column][row] = 'x'
 
-    // this.setNumbers(row, column)
+    this.setNumbers(column, row)
   },
-  setNumbers (row, column) {
+  // set numbers tips
+  setNumbers (column, row) {
     let board = this.template
 
-    function upperRow (x, y) {
-      for (let i = -1; i < 1; i++) {
-        if (x !== 0 && board[x - 1][y + i] !== 'x') {
-          board[x - 1][y + i]++
-          game.add.text(
-            (x - 1) * this.cellWidth, (y + i) * this.cellHeight,
-            board[x - 1][y + i],
-            { font: '22px Arial', fill: '#ffffff', boundsAlignH: 'center' }
-          )
+    // y is for column
+    // x is for row
+    function upperRow (y, x) {
+      for (let i = -1; i < 2; i++) {
+        // if x === 0 game can't draw number for left upper side
+        if (x === 0 && i === -1) {
+          ++i
+        }
+        // if x or y === 0, game will return an error,
+        // because array not have a negative index
+        if (y !== 0 && board[y - 1][x + i] !== 'x') {
+          board[y - 1][x + i]++
         }
       }
     }
 
-    upperRow(row, column)
+    upperRow(column, row)
 
-    // function lowerRow (x, y) {
-    //   console.log('Hi!')
-    // }
+    function lowerRow (x, y) {}
 
-    // for (let i = 0; i < 10; i++) {
-    //   for (let j = 0; j < 10; j++) {
-    //     if (i !== 0) {
-    //       upperRow(i, j)
-    //     }
-    //
-    //     // if (i !== 9) {
-    //     //   lowerRow(i, j)
-    //     // }
-    //   }
-    // }
+    lowerRow(column, row)
+  },
+  drawNumbers () {
+    let board = this.template
+
+    let cellHeight = this.cellHeight
+    let cellWidth = this.cellWidth
+
+    for (let i = 0; i < 10; i++) {
+      for (let j = 0; j < 10; j++) {
+        if (board[i][j] && board[i][j] !== 'x') {
+          game.add.text(
+            j * cellHeight, i * cellWidth,
+            board[i][j], { font: '22px Arial', fill: '#ff0000' }
+          )
+        }
+      }
+    }
   },
   revealCell () {
-    console.log('Hello, world!')
+    let board = this.template
+
+    let cellIndexY = Math.floor(game.input.y / this.cellHeight)
+    let cellIndexX = Math.floor(game.input.x / this.cellWidth)
+
+    console.log(board[cellIndexY][cellIndexX])
+
+    console.log(board)
   },
   showMines () {
     let board = this.template
 
+    let cellHeight = this.cellHeight
+    let cellWidth = this.cellWidth
+
+    // i is for column (Y-axis)
+    // j is for row (X-axis)
     for (let i = 0; i < 10; i++) {
       for (let j = 0; j < 10; j++) {
-        if (board[i][j]) {
-          game.add.image(i * this.cellWidth, j * this.cellHeight, 'mine')
+        if (board[i][j] === 'x') {
+          // http://phaser.io/docs/2.6.2/Phaser.GameObjectFactory.html#image
+          // add.image(X-axis, Y-axis, key, frame, group)
+          game.add.image(j * cellWidth, i * cellHeight, 'mine')
         }
       }
     }

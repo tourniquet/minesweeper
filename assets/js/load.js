@@ -19,6 +19,6 @@ let loadState = {
     // game.load.audio('gameOver', ['assets/audio/dead.mp3', 'assets/audio/dead.ogg'])
   },
   create () {
-    game.state.start('menu')
+    game.state.start('play')
   }
 }
