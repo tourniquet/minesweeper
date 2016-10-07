@@ -68,13 +68,18 @@ let playState = {
   setNumbers (column, row) {
     let board = this.template
 
+    // calculate hints for upper row
     // y is for column
     // x is for row
-    function upperRow (y, x) {
+    ;(function (y, x) {
       for (let i = -1; i < 2; i++) {
         // if x === 0 game can't draw number for left upper side
         if (x === 0 && i === -1) {
           ++i
+        }
+        // if x === 9 game can't draw number for right upper side
+        if (x === 9 && i === 1) {
+          break
         }
         // if x or y === 0, game will return an error,
         // because array not have a negative index
@@ -82,13 +87,42 @@ let playState = {
           board[y - 1][x + i]++
         }
       }
-    }
+    })(column, row)
+    // upperRow(column, row)
 
-    upperRow(column, row)
+    // calculate hints for lower row
+    ;(function (y, x) {
+      for (let i = -1; i < 2; i++) {
+        // if x === 0 game can't draw number for left down side
+        if (x === 0 && i === -1) {
+          ++i
+        }
+        // if x === 9 game can't draw number for right down side
+        if (x === 9 && i === 1) {
+          break
+        }
+        // if x === 0 or y === 9 game will return an error,
+        // because array not have a negative index
+        if (y < 9 && board[y + 1][x + i] !== 'x') {
+          board[y + 1][x + i]++
+        }
+      }
+    })(column, row)
+    // lowerRow(column, row)
 
-    function lowerRow (x, y) {}
+    // calculate left side hints
+    ;(function (y, x) {
+      if (board[y][x - 1] !== 'x') {
+        board[y][x - 1]++
+      }
+    })(column, row)
 
-    lowerRow(column, row)
+    // calculate left side hints
+    ;(function (y, x) {
+      if (board[y][x + 1] !== 'x') {
+        board[y][x + 1]++
+      }
+    })(column, row)
   },
   drawNumbers () {
     let board = this.template
